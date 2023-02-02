@@ -29,18 +29,17 @@ pub fn Queue(comptime T: type) type {
             var new_node: *Node(T) = try allocator.create(Node(T));
             new_node.next = self.tail;
             new_node.value = value;
-            if (self.tail) |tail| {
-                tail.next = new_node;
-            }
-            else {
+            if (self.tail) |*tail| {
+                (tail.*.next) = new_node;
+            } else {
                 self.head = new_node;
             }
             self.tail = new_node;
         }
 
         pub fn pop_front(self:Queue(T)) void {
-            if (!self.head) {return;}
-            var old_head = self.head;
+            // self.head
+            var old_head = self.head orelse {return;};
             self.head = self.head.next;
             allocator.free(old_head);
         }
@@ -60,16 +59,9 @@ var allocator: Allocator = arena.allocator();
 
 const expect = @import("std").testing.expect;
 test "see if anything works" {
-
-    // var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    // defer arena.deinit();
-
-    // const allocator = arena.allocator();
-
-    // const ptr = try allocator.create(i32);
-    // std.debug.print("ptr={*}\n", .{ptr});
-
     var queue: Queue(i32) = Queue(i32).new_empty();
     try queue.push_back(55);
+    try queue.push_back(2);
     try expect(queue.front().? == 55);
+    try expect(queue.front().? == 2);
 }
