@@ -2,20 +2,21 @@ const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
 
-pub fn Queue(comptime T: type) type {
+pub fn Queue(comptime T: type, comptime allocator: Allocator) type {
     return struct {
         head: ?*Node(T),
         tail: ?*Node(T),
 
 
-        pub fn new_empty() Queue(T) {
-            return Queue(T) {
+        pub fn new_empty() @This() {
+            return @This() {
                 .head = null,
                 .tail = null,
             };
         }
 
-        pub fn front(self:Queue(T)) ?T {
+        // This dereferences one pointer. O(n)
+        pub fn front(self:@This()) ?T {
             if (self.head) |head| {
                 return head.value;
             }
@@ -24,7 +25,8 @@ pub fn Queue(comptime T: type) type {
             }
         }
         
-        pub fn push_back(self: *Queue(T), value: T) !void {
+        // This just operates on a set number of pointers. O(n)
+        pub fn push_back(self: *@This(), value: T) !void {
             var new_node: *Node(T) = try allocator.create(Node(T));
             new_node.next = self.tail;
             new_node.value = value;
@@ -36,21 +38,20 @@ pub fn Queue(comptime T: type) type {
             self.tail = new_node;
         }
 
-        pub fn pop_front(self: *Queue(T)) void {
+        // This operates on a set number of pointers. O(n)
+        pub fn pop_front(self: *@This()) void {
             if (self.head) |head| {
-                const tail = self.tail.?;
+                var tail = self.tail.?;
                 if (head == tail) {
                     // If there is only one element left in the queue, null it out.
-                    allocator.free(head);
-                    allocator.free(tail);
+                    allocator.destroy(head);
                     self.head = null;
                     self.tail = null;
+                    return;
                 }
-                else {
-                    var old_head = head;
-                    self.head = head.next;
-                    allocator.free(old_head);
-                }
+                var old_head = head;
+                self.head = head.next;
+                allocator.destroy(old_head);
             }
         }
     };
@@ -64,15 +65,19 @@ fn Node(comptime T: type) type {
     };
 }
 
+
+// I had a nice blob of text here but I lost it allong with all my comments when I popped stash allong with a bunch of work.
+// I dont know why this line has to be this way. Its from https://ziglearn.org/chapter-2/
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-var allocator: Allocator = arena.allocator();
+const test_alloc: Allocator = arena.allocator();
 
 const expect = @import("std").testing.expect;
-test "see if anything works" {
-    var queue: Queue(i32) = Queue(i32).new_empty();
+test "Test pop, push, and peek" {
+    const Queue_i32 = Queue(i32, test_alloc);
+    var queue: Queue_i32 = Queue_i32.new_empty();
     try queue.push_back(55);
     try queue.push_back(2);
-    queue.pop_front();
     try expect(queue.front().? == 55);
+    queue.pop_front();
     try expect(queue.front().? == 2);
 }
