@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/assignment4
+assignment4.so
+assignment4.dylib
+assignment4.dll
+assignment4.a
+assignment4.lib
+assignment4-test-*
+*.exe
+*.o
+*.obj
+*.lst
