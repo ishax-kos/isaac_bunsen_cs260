@@ -20,3 +20,9 @@ This is the List.fetch declaration on line 60.
 ## 4
 All 3 functions iterate through the entire list until the desired spot is found. Therefore they are all O(n).
 Note the while(1) loops.
+
+
+## Installing the compiler
+I wrote this in D because I'm behind and I wanted to write it quickly.
+D can be gotten here [https://dlang.org/download.html].
+Run the tests through the package manager with `dub run` from the `assignment#` directory.
