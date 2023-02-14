@@ -25,4 +25,4 @@ Note the while(1) loops.
 ## Installing the compiler
 I wrote this in D because I'm behind and I wanted to write it quickly.
 D can be gotten here [https://dlang.org/download.html].
-Run the tests through the package manager with `dub run` from the `assignment#` directory.
+Run the tests through the package manager with `dub test` from the `assignment#` directory.
