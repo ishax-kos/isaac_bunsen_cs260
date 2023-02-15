@@ -34,3 +34,9 @@
 - See line 75 of src/queue.zig
 
 1. Be sure to commit changes regularly to your git repo
+
+
+## Zig instructions
+Install Zig by doing `choco install zig` if you have chocolatey on windows. Its on many package managers.
+More options here [https://ziglang.org/learn/getting-started/#installing-zig].
+to build and test do `zig build test`.
