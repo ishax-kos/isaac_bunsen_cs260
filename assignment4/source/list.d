@@ -36,7 +36,7 @@ struct List(Type) {
 
 
 unittest {
-    List!int foo 
+    List!int foo;
     // import std.stdio;
 	// writeln("Edit source/app.d to start your project.");
 }
