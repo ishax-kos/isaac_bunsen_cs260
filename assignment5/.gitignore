@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/assignment5
+assignment5.so
+assignment5.dylib
+assignment5.dll
+assignment5.a
+assignment5.lib
+assignment5-test-*
+*.exe
+*.o
+*.obj
+*.lst
