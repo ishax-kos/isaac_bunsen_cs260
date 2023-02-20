@@ -2,12 +2,16 @@ const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
 
+// A data structure that operates on a first in - first out basis.
 pub fn Queue(comptime T: type, comptime allocator: Allocator) type {
+    // This is returning a type. I think the methods
+    // Are actually static members holding function pointers.
     return struct {
         head: ?*Node(T),
         tail: ?*Node(T),
 
 
+        // Create a new queue.
         pub fn new_empty() @This() {
             return @This() {
                 .head = null,
@@ -15,6 +19,7 @@ pub fn Queue(comptime T: type, comptime allocator: Allocator) type {
             };
         }
 
+        // Get the front element of a queue.
         // This dereferences one pointer. O(n)
         pub fn front(self:@This()) ?T {
             if (self.head) |head| {
@@ -24,7 +29,8 @@ pub fn Queue(comptime T: type, comptime allocator: Allocator) type {
                 return null;
             }
         }
-        
+
+        // Add a new element to the queue at the back.
         // This just operates on a set number of pointers. O(n)
         pub fn push_back(self: *@This(), value: T) !void {
             var new_node: *Node(T) = try allocator.create(Node(T));
@@ -38,6 +44,7 @@ pub fn Queue(comptime T: type, comptime allocator: Allocator) type {
             self.tail = new_node;
         }
 
+        // Remove an element from the queue at the front.
         // This operates on a set number of pointers. O(n)
         pub fn pop_front(self: *@This()) void {
             if (self.head) |head| {
@@ -57,7 +64,7 @@ pub fn Queue(comptime T: type, comptime allocator: Allocator) type {
     };
 }
 
-
+// A datatype that stores an internal element of a queue.
 fn Node(comptime T: type) type {
     return struct {
         next: ?*Node(T),

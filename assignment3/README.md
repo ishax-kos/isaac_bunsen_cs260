@@ -1,28 +1,30 @@
-# Requirements 
+# Requirements
 
 1. Based on what we know about linked lists, stacks, and queues, design a linked queue (a queue using a linked-list to store the data in the structure)
+
+see src/queue.zig for implementation.
 
 -- See last assignment
 
 1. Design, implement, and test a Queue data structure that:
 
-    
+
     1. uses a linked-list to store values in the queue
-    - See line 5 of src/queue.zig
+    - See line 6 of src/queue.zig "pub fn Queue(..."
 
-        
+
     1. has an enqueue method that will appropriately add a value to the back of the queue as an appropriate element
-    - See line 29 of src/queue.zig
+    - See line 35 of src/queue.zig "pub fn push_back(..."
 
-        
+
     1. has a dequeue method that will appropriately remove an element from the front of the queue and return its value
-    - See line 42 of src/queue.zig
+    - See line 49 of src/queue.zig "pub fn pop_front(..."
     I actually skipped out on the return part. That functionality must be obtained using .front()
 
-        
+
     1. Optionally has a peek method that returns the value at the front of the queue without removing it
         Bonus if you also create an array based Queue!
-    - See line 19 of src/queue.zig
+    - See line 24 of src/queue.zig "pub fn front(..."
 
 
 1. Analyze the complexity of your implementations (at least the run-time of the add, remove, and peek methods).
