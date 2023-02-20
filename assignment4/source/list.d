@@ -4,7 +4,7 @@ module list;
 struct List(Type) {
     import better_nullable;
     import std.exception: enforce;
-    
+
     bool empty() {
         return !node_front.is_some;
     }
@@ -19,7 +19,7 @@ struct List(Type) {
             Node* current_node = node_front.get;
             /// This operates on a nodes next property and must therefore
             /// be ahead by 1.
-            int pos = 1; 
+            int pos = 1;
             while (1) {
                 if (pos == position) {break;}
                 pos += 1;
@@ -35,7 +35,7 @@ struct List(Type) {
     void remove(int position) {
         enforce(0 <= position, "Position cannot be negative (for now).");
         enforce(!this.empty, "Cannot remove from an empty list");
-        
+
         if (position == 0) {
             node_front = node_front.get.next;
             return;
@@ -60,7 +60,7 @@ struct List(Type) {
     Type fetch(int position) {
         enforce(0 <= position, "Position cannot be negative (for now).");
         enforce(!this.empty, "Getting value in empty list!");
-        
+
         Node* current_node = node_front.get;
         int pos = 0;
         while (1) {
@@ -96,9 +96,11 @@ struct List(Type) {
     // Node* seek;
 }
 
+
 version(unittest) {
     import std.format;
 }
+
 
 unittest {
     List!int foo;
@@ -138,5 +140,5 @@ unittest {
         foo.remove(-1);
         assert(false);
     } catch(Exception e) {}
-    
+
 }
