@@ -3,6 +3,7 @@ module better_nullable;
 struct Nullable_discriminated(Type, Type null_state) {
     import std.exception: enforce;
     private Type value = null_state;
+    alias set_this this;
 
     enum typeof(this) none = typeof(this)(null_state);
 
@@ -10,13 +11,28 @@ struct Nullable_discriminated(Type, Type null_state) {
         value = n;
     }
 
-    bool is_some() {
+    bool is_some() const {
         return this.value != null_state;
     }
 
-    Type get() {
-        enforce(this.is_some);
+    ref Type get() {
+        enforce(this.is_some());
         return this.value;
+    }
+
+    const(Type) get() const {
+        enforce(this.is_some());
+        return this.value;
+    }
+
+    void set_this(Type value) {
+        this.value = value;
+    }
+
+    string toString() const {
+        import std.conv;
+        if (this.is_some()) {return value.to!string();}
+        else {return "null";}
     }
     // import std.traits: isCallable, ReturnType;
     // auto match(handlers...)() if (handlers.length == 2) {
