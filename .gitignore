@@ -2,3 +2,4 @@
 *.obj
 /.vscode
 */zig-cache
+test.*
