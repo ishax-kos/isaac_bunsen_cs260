@@ -32,7 +32,11 @@ struct Nullable_discriminated(Type, Type null_state) {
     string toString() const {
         import std.conv;
         if (this.is_some()) {return value.to!string();}
-        else {return "null";}
+        else {return "none";}
+    }
+
+    void nullify() {
+        this.value = null_state;
     }
     // import std.traits: isCallable, ReturnType;
     // auto match(handlers...)() if (handlers.length == 2) {
