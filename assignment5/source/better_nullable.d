@@ -3,7 +3,6 @@ module better_nullable;
 struct Nullable_discriminated(Type, Type null_state) {
     import std.exception: enforce;
     private Type value = null_state;
-    alias set_this this;
 
     enum typeof(this) none = typeof(this)(null_state);
 
@@ -25,7 +24,7 @@ struct Nullable_discriminated(Type, Type null_state) {
         return this.value;
     }
 
-    void set_this(Type value) {
+    void opAssign(Type value) {
         this.value = value;
     }
 
@@ -38,17 +37,6 @@ struct Nullable_discriminated(Type, Type null_state) {
     void nullify() {
         this.value = null_state;
     }
-    // import std.traits: isCallable, ReturnType;
-    // auto match(handlers...)() if (handlers.length == 2) {
-    //     // static assert(isCallable!(handlers[0]), "Argument 1 of match must be callable!");
-    //     // static assert(isCallable!(handlers[1]), "Argument 2 of match must be callable!");
-    //     // static assert(is(ReturnType!(handlers[0]) == ReturnType!(handlers[1])), "Predicates must return the same type.");
-    //     if (this.isNull) {
-    //         return handlers[1]();
-    //     } else {
-    //         return handlers[0](this.value);
-    //     }
-    // }
 }
 
 
@@ -63,11 +51,4 @@ auto nullable_pointer(Type)(Type val) {
     else {
         return (Nullable_pointer!Type) {value: new Type(val);};
     }
-}
-
-
-
-private struct Non_null_ptr(T) if (isPointer!T) {
-    T value;
-    alias value this;
 }
