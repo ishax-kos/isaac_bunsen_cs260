@@ -260,6 +260,8 @@ unittest {
     // import std.stdio;
     Tree!char tree;
 
+    // If the tree is empty, ranges that iterate
+    // it should be as well.
     assert(tree.in_order().empty());
     assert(tree.post_order().empty());
     assert(tree.pre_order().empty());
@@ -331,6 +333,9 @@ unittest {
     import std.algorithm.comparison;
     // import std.stdio;
     Tree!char tree;
+    // If the tree is empty, ranges that iterate
+    // it should be as well.
+    assert(tree.breadth_first().empty());
     // Based on the traversal diagram on wikipedia
     // Are the ranges able to reproduce the same
     // order of letters as they appear in reading order?
