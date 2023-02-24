@@ -3,7 +3,7 @@ import better_nullable;
 import std.algorithm.iteration;
 import std.algorithm.comparison;
 import std.algorithm.searching;
-import std.format;
+import std.concurrency: Generator, yield;
 
 /++ A Binary tree. +/
 struct Tree(Type) {
@@ -32,6 +32,33 @@ struct Tree(Type) {
     find(Type value) {
         return this.root.find!Type(value);
     }
+
+    /++ Produces a range that fetches values
+        in sorted order +/
+    auto in_order() {
+        return new Generator!(char)(() {
+            traverse!(Order.in_, char)(this.root);
+        });
+    }
+    /++ Produces a range that iterates a
+        pre-order traversal +/
+    auto pre_order() {
+        return new Generator!(char)(() {
+            traverse!(Order.pre, char)(this.root);
+        });
+    }
+    /++ Produces a range that iterates a
+        post-order traversal +/
+    auto post_order() {
+        return new Generator!(char)(() {
+            traverse!(Order.post, char)(this.root);
+        });
+    }
+    /++ Produces a range that iterates the
+        tree in breadth-first order +/
+    auto breadth_first() {
+        return Traversal_breadth_first!Type(this);
+    }
 }
 
 
@@ -52,10 +79,13 @@ struct Node(Type) {
 }
 
 
-void insert(Type)(ref Nullable_pointer!(Node!Type) node, Node!Type* new_node) {
+void insert(Type)(
+    ref Nullable_pointer!(Node!Type) node,
+    Node!Type* new_node
+) {
     if (node.is_some()) {
         auto old = node.get();
-        old.children[old.value > new_node.value]
+        old.children[old.value < new_node.value]
             .insert!Type(new_node)
         ;
     } else {
@@ -64,6 +94,7 @@ void insert(Type)(ref Nullable_pointer!(Node!Type) node, Node!Type* new_node) {
 }
 
 unittest { /// Test insert overloads
+    import std.format;
     Tree!char tree;
     // A root node with no children should be height 0
     tree.insert('b');
@@ -77,6 +108,7 @@ unittest { /// Test insert overloads
     assert (1 == len, format!"%s"(len));
 }
 unittest {
+    import std.format;
     Tree!char tree;
     // Without balancing, adding sequential values should
     // increase the height for each value added.
@@ -101,7 +133,8 @@ find_and_remove(Type)(
     if (node_ref.is_some()) {
         auto node = node_ref.get();
         if (node.value != value) {
-            return node.children[node.value > value].find_and_remove!Type(value);
+            return node.children[node.value < value]
+                .find_and_remove!Type(value);
         }
         node_ref = node.children[0];
         if (node.children[1].is_some()) {
@@ -150,7 +183,7 @@ find(Type)(ref Nullable_pointer!(Node!Type) node_ref, Type value) {
     if (node_ref.is_some()) {
         auto node = node_ref.get();
         if (node.value != value) {
-            return node.children[node.value > value].find!Type(value);
+            return node.children[node.value < value].find!Type(value);
         }
         return nullable_pointer(&node.value);
     } else {
@@ -178,6 +211,140 @@ unittest { /// Test find function
     tree.find_and_remove('c');
     assert(!tree.find('a').is_some());
     assert(!tree.find('c').is_some());
+}
+
+struct Traversal_node(T) {
+    // Traversal_node(T)* last;
+}
+
+void traverse_in_order(Type, traversal)(ref Node!Type node) {
+    import std.concurrency;
+    // import std.stdio;
+    writefln!"Pre: %s"(node.value);
+    if (node.children[0].is_some()) {
+        traverse(*node.children[0].get());
+    }
+    static if (0) {yeild(node.value);}
+    if (node.children[1].is_some()) {
+        traverse(*node.children[1].get());
+    }
+    writefln!"        Post: %s"(node.value);
+    // if (node.children[0].is_some()) {
+    //     recurse(node.children[0].get());
+    // }
+}
+
+
+void traverse(Order order, Type)(Nullable_pointer!(Node!Type) node) {
+    if (node.is_some()) {
+        import std.concurrency;
+        auto some = node.get();
+        static if (order == Order.pre) {yield(some.value);}
+        traverse!(order, Type)(some.children[0]);
+        static if (order == Order.in_) {yield(some.value);}
+        traverse!(order, Type)(some.children[1]);
+        static if (order == Order.post) {yield(some.value);}
+    } else {
+        return;
+    }
+}
+
+enum Order {
+    pre,
+    in_,
+    post,
+}
+
+unittest {
+    import std.algorithm.comparison;
+    // import std.stdio;
+    Tree!char tree;
+
+    assert(tree.in_order().empty());
+    assert(tree.post_order().empty());
+    assert(tree.pre_order().empty());
+
+    // Based on the traversal diagram on wikipedia
+    // Are the ranges able to reproduce the same
+    // order of letters?
+    tree.insert('f');
+    tree.insert('b');
+    tree.insert('g');
+    tree.insert('a');
+    tree.insert('d');
+    tree.insert('i');
+    tree.insert('c');
+    tree.insert('e');
+    tree.insert('h');
+    import std.concurrency;
+
+    assert(equal(tree.in_order(),   "abcdefghi"));
+    assert(equal(tree.post_order(), "acedbhigf"));
+    assert(equal(tree.pre_order(),  "fbadcegih"));
+}
+
+
+/++
+    A traversal struct
+    contains a queue and a tree.
+    +/
+struct Traversal_breadth_first(Type) {
+    import queue;
+    Tree!Type tree;
+    Queue!(Node!Type*) queue_;
+
+    this(Tree!Type tree) {
+        this.tree = tree;
+        if (tree.root.is_some()) {
+            this.queue_.insert_back(tree.root.get());
+        }
+    }
+
+    Type front() {
+        return queue_.front().value;
+    }
+
+    void pop_front() {
+        auto node = queue_.front();
+        queue_.pop_front();
+        node.children[]
+            .filter!(a=>a.is_some())
+            .each!(a=>queue_.insert_back(a.get()));
+    }
+    alias popFront = pop_front;
+
+    bool empty() {
+        return queue_.empty();
+    }
+
+}
+// void traversal_breadth_first() {
+//     Queue!Type queue;
+//     root
+//         .filter!(a=>a.is_some())
+//         .each()
+//     ;
+// }
+
+
+unittest {
+    import std.algorithm.comparison;
+    // import std.stdio;
+    Tree!char tree;
+    // Based on the traversal diagram on wikipedia
+    // Are the ranges able to reproduce the same
+    // order of letters as they appear in reading order?
+    tree.insert('f');
+    tree.insert('b');
+    tree.insert('g');
+    tree.insert('a');
+    tree.insert('d');
+    tree.insert('i');
+    tree.insert('c');
+    tree.insert('e');
+    tree.insert('h');
+    auto traversal = Traversal_breadth_first!char(tree);
+    assert(equal(traversal, "fbgadiceh"));
 }
 
 
