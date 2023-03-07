@@ -33,6 +33,13 @@ struct Hash_table(Key, Value) {
         return memory[hash(key) % memory.length].nullify();
     }
 
+    /++ Fetches a value from the table. +/
+    Value fetch(Key key) {
+        import std.exception: enforce;
+        enforce(contains(key));
+        return *(memory[hash(key) % memory.length].get());
+    }
+
     /++ Hashes a value+/
     private static
     Hash_type hash(Key)(Key value) {

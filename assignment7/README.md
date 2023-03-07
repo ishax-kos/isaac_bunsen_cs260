@@ -8,16 +8,27 @@
 
 1. Create some tests (at least one per piece of functionality) before you begin coding that you want your hashtable to pass before you start coding.
 
+    See the `unittest` blocks.
+
 1. Create a hashtable that resolves collisions by simply overwriting the old value with the new value, including at least:
 
     1. Describe the way that you decide on hashing a value
     (this can be simple or complex based on how interesting you find the topic)
 
+        To hash I value I used a form of the 'mid square' method. I first reduced each value to a set sized integer if it wasnt already. Then I squared the value and shifted it by 1/4 of the total bit width of the integer.
+
     1. An insert function that places the value at the appropriate location based on its hash value
+
+        See line 21, the `insert` method.
 
     1. A contains function that returns whether the value is already in the hashtable
 
+        See line 16, the `contains` method. I later misread the prompt and thought it had to return the value at that key, and so I also implemented the `fetch` method at line 37.
+
     1. (optional) A delete function that removes a value based on its hash and then returns that value…
+
+        See line 31, the `remove` method. `delete` is a default method already.
+
 
 1. Then create a smarter hashtable (double hashing or chaining) including at least the same functions as the simple hashtable
 
