@@ -12,6 +12,8 @@
 
 1. Create a hashtable that resolves collisions by simply overwriting the old value with the new value, including at least:
 
+    See the file "hash_table.d".
+
     1. Describe the way that you decide on hashing a value
     (this can be simple or complex based on how interesting you find the topic)
 
@@ -32,6 +34,10 @@
 
 1. Then create a smarter hashtable (double hashing or chaining) including at least the same functions as the simple hashtable
 
+    See the file "hash_table_improved.d". I added a linked list structure.
+
 1. Compare some information relating to collisions (frequency) and their effect on complexity (of insert and contains methods)
+
+    The complexity for the dumb table is O(n) every time. The addition of lists to handle collisions means that those collisions can pile up and make the hash table O(n).
 
 1. Once you have implemented and tested your code, add to the README file what line(s) of code or inputs and outputs show your work meeting each of the above requirements (or better, include a small screen snip of where it meets the requirement!).
